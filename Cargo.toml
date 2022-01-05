@@ -1,0 +1,25 @@
+[package]
+name = "advent_of_code"
+version = "0.1.0"
+edition = "2018"
+
+[[bin]]
+name = "16-1"
+path = "src/y2016/day1/main.rs"
+
+[[bin]]
+name = "16-2"
+path = "src/y2016/day2/main.rs"
+
+[[bin]]
+name = "16-3"
+path = "src/y2016/day3/main.rs"
+
+[[bin]]
+name = "16-4"
+path = "src/y2016/day4/main.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
