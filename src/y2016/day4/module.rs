@@ -1,10 +1,10 @@
 use std::{collections::BTreeMap, iter::FromIterator};
 
-pub fn check_hash(data: &str) {
+pub fn check_hash(data: &str) -> (bool, u32) {
     let collection = data.split('-').collect::<Vec<&str>>();
     //last one is hash with 1234[<hash>]
     let mut hash_with_id = collection.last().unwrap().split('[');
-    let id = hash_with_id.next().unwrap();
+    let id = hash_with_id.next().unwrap().parse::<u32>().unwrap();
     let tmp = hash_with_id.next().unwrap();
     //remove ] from hash
     let hash = &tmp[0..tmp.len() - 1];
@@ -22,17 +22,25 @@ pub fn check_hash(data: &str) {
 
     let mut v = Vec::from_iter(char_map);
     v.sort_by(|&(_, a), &(_, b)| b.cmp(&a));
-    let new_vec = v.windows(5);
+    let new_vec = v.windows(5).nth(0).unwrap();
     let mut calc_hash = String::new();
-    for x in new_vec[0].unwrap() {
-        calc_hash.push(x[0].0);
+    for x in new_vec {
+        calc_hash.push(x.0);
     }
-    println!("ID: {}, Hash: {}, Calculated hash {}", id, hash, calc_hash);
+
+    (hash == calc_hash, id)
 }
 
 pub fn part_1(data: &str) -> String {
-    // data.lines().filter(|s| s.split('-'))
-    "Test".to_owned()
+    let mut sum: u32 = 0;
+    for line in data.lines() {
+        let (res, id) = check_hash(line);
+        if res {
+            sum += id;
+        }
+    }
+
+    sum.to_string()
 }
 pub fn part_2(data: &str) -> String {
     let count = 0;
