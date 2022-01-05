@@ -54,12 +54,8 @@ mod tests {
 
     #[test]
     fn test_1() {
-        let test_case = "aaaaa-bbb-z-y-x-123[abxyz]\n
-        a-b-c-d-e-f-g-h-987[abcde]\n
-        not-a-real-room-404[oarel]\n
-        totally-real-room-200[decoy]";
-        check_hash("not-a-real-room-404[oarel]");
-        // assert_eq!(part_1(&test_case), "1514");
+        let test_case = "aaaaa-bbb-z-y-x-123[abxyz]\na-b-c-d-e-f-g-h-987[abcde]\nnot-a-real-room-404[oarel]\ntotally-real-room-200[decoy]";
+        assert_eq!(part_1(&test_case), "1514");
     }
 
     #[test]
