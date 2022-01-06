@@ -1,51 +1,97 @@
 use std::{collections::BTreeMap, iter::FromIterator};
 
-pub fn check_hash(data: &str) -> (bool, u32) {
-    let collection = data.split('-').collect::<Vec<&str>>();
-    //last one is hash with 1234[<hash>]
-    let mut hash_with_id = collection.last().unwrap().split('[');
-    let id = hash_with_id.next().unwrap().parse::<u32>().unwrap();
-    let tmp = hash_with_id.next().unwrap();
-    //remove ] from hash
-    let hash = &tmp[0..tmp.len() - 1];
-    let mut char_map: BTreeMap<char, u32> = BTreeMap::new();
-    for i in 0..collection.len() - 1 {
-        let chars = collection[i].chars().collect::<Vec<_>>();
-        for c in chars {
-            let mut cnt = 1;
-            if char_map.contains_key(&c) {
-                cnt = char_map.get(&c).unwrap() + 1;
-            }
-            char_map.insert(c, cnt);
+pub struct EncryptedName<'a> {
+    pub id: usize,
+    pub data: &'a str,
+    pub hash: &'a str,
+}
+
+impl<'a> EncryptedName<'a> {
+    pub fn new(input: &'a str) -> Self {
+        EncryptedName {
+            id: input[input.len() - 10..input.len() - 7]
+                .parse::<usize>()
+                .unwrap(),
+            data: &input[0..input.len() - 11],
+            hash: &input[input.len() - 6..input.len() - 1],
         }
     }
 
-    let mut v = Vec::from_iter(char_map);
-    v.sort_by(|&(_, a), &(_, b)| b.cmp(&a));
-    let new_vec = v.windows(5).nth(0).unwrap();
-    let mut calc_hash = String::new();
-    for x in new_vec {
-        calc_hash.push(x.0);
+    pub fn calculate_hash(&self) -> String {
+        let mut hash = String::new();
+        let mut char_map: BTreeMap<char, u32> = BTreeMap::new();
+        let tokens = self.data.split('-').collect::<Vec<&str>>();
+        for token in tokens {
+            for c in token.chars() {
+                let mut cnt = 1;
+                if char_map.contains_key(&c) {
+                    cnt = char_map.get(&c).unwrap() + 1;
+                }
+                char_map.insert(c, cnt);
+            }
+        }
+
+        let mut pairs = Vec::from_iter(char_map);
+        pairs.sort_by(|&(_, a), &(_, b)| b.cmp(&a));
+
+        let pairs_of_interest = pairs.windows(5).nth(0).unwrap();
+        for pair in pairs_of_interest {
+            hash.push(pair.0);
+        }
+        hash
     }
 
-    (hash == calc_hash, id)
+    pub fn get_decrypted_data(&self) -> String {
+        let mut decrypted = String::new();
+
+        for c in self.data.chars() {
+            match c {
+                '-' => decrypted.push(' '),
+                _ => {
+                    let find_index = |c: &char| -> usize {
+                        let mut index: usize = 0;
+                        for char in "abcdefghijklmnopqrstuvwxyz".chars() {
+                            if char == *c {
+                                return index;
+                            }
+                            index += 1;
+                        }
+                        panic!("Unknown char!");
+                    };
+                    let find_char = |index: usize| -> char {
+                        "abcdefghijklmnopqrstuvwxyz".chars().nth(index).unwrap()
+                    };
+
+                    let new_index = (find_index(&c) + self.id) % "abcdefghijklmnopqrstuvwxyz".len();
+                    decrypted.push(find_char(new_index));
+                }
+            }
+        }
+        decrypted
+    }
 }
 
 pub fn part_1(data: &str) -> String {
     let mut sum: u32 = 0;
     for line in data.lines() {
-        let (res, id) = check_hash(line);
-        if res {
-            sum += id;
+        let item = EncryptedName::new(line);
+        if item.hash == item.calculate_hash() {
+            sum += 1;
         }
     }
-
     sum.to_string()
 }
-pub fn part_2(data: &str) -> String {
-    let count = 0;
 
-    count.to_string()
+pub fn part_2(data: &str) -> String {
+    let mut room_id: usize = 0;
+    for line in data.lines() {
+        let item = EncryptedName::new(line);
+        let encrypted_data = item.get_decrypted_data();
+        if encrypted_data == "northpole object storage" {
+            room_id = item.id;
+        }
+    }
+    room_id.to_string()
 }
 
 #[cfg(test)]
@@ -60,10 +106,7 @@ mod tests {
 
     #[test]
     fn test_2() {
-        let test_case = "aaaaa-bbb-z-y-x-123[abxyz]\n
-            a-b-c-d-e-f-g-h-987[abcde]\n
-            not-a-real-room-404[oarel]\n
-            totally-real-room-200[decoy]";
-        assert_eq!(part_2(&test_case), "6");
+        let test_case = "bcfhvdczs-cpxsqh-ghcfous-324[chsfb]";
+        assert_eq!(part_2(&test_case), "324");
     }
 }
