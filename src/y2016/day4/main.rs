@@ -11,7 +11,7 @@ fn main() {
     let data = Path::new("src/y2016/day4/data.txt");
     let test_str = parser::parser::parse_input_file(data);
     let result = module::part_1(&test_str);
-    println!("Result: {}", result);
+    println!("Result part 1: {}", result);
     let result2 = module::part_2(&test_str);
-    println!("Result: {}", result2);
+    println!("Result part 2: {}", result2);
 }
