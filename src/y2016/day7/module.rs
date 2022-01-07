@@ -11,19 +11,73 @@ fn is_tls(input: &str) -> bool {
 pub fn part_1(input: &str) -> String {
     let mut tls_count = 0;
     for line in input.lines() {
-        let mut tokens = line.split(&['[', ']'][..]);
-        let before_hypernet = tokens.next().unwrap();
-        let hypernet = tokens.next().unwrap();
-        let after_hypernet = tokens.next().unwrap();
-        if !is_tls(hypernet) && (is_tls(before_hypernet) || is_tls(after_hypernet)) {
-            tls_count += 1;
+        let tokens = line.split(&['[', ']'][..]);
+        let mut non_hypernets: Vec<&str> = Vec::new();
+        let mut hypernets: Vec<&str> = Vec::new();
+        let mut flag_hypernets = false;
+        for token in tokens {
+            if flag_hypernets {
+                hypernets.push(token);
+                flag_hypernets = false;
+            } else {
+                non_hypernets.push(token);
+                flag_hypernets = true;
+            }
+        }
+
+        let mut has_abba_in_hypernets = false;
+        for hypernet in hypernets {
+            if is_tls(hypernet) {
+                has_abba_in_hypernets = true;
+            }
+        }
+        if has_abba_in_hypernets {
+            continue;
+        }
+        for non_hypernet in non_hypernets {
+            if is_tls(non_hypernet) {
+                tls_count += 1;
+                break;
+            }
         }
     }
     tls_count.to_string()
 }
 
 pub fn part_2(input: &str) -> String {
-    todo!()
+    let mut tls_count = 0;
+    for line in input.lines() {
+        let tokens = line.split(&['[', ']'][..]);
+        let mut non_hypernets: Vec<&str> = Vec::new();
+        let mut hypernets: Vec<&str> = Vec::new();
+        let mut flag_hypernets = false;
+        for token in tokens {
+            if flag_hypernets {
+                hypernets.push(token);
+                flag_hypernets = false;
+            } else {
+                non_hypernets.push(token);
+                flag_hypernets = true;
+            }
+        }
+
+        let mut has_abba_in_hypernets = false;
+        for hypernet in hypernets {
+            if is_tls(hypernet) {
+                has_abba_in_hypernets = true;
+            }
+        }
+        if has_abba_in_hypernets {
+            continue;
+        }
+        for non_hypernet in non_hypernets {
+            if is_tls(non_hypernet) {
+                tls_count += 1;
+                break;
+            }
+        }
+    }
+    tls_count.to_string()
 }
 
 #[cfg(test)]
@@ -32,8 +86,8 @@ mod tests {
 
     #[test]
     fn test_1() {
-        let test_case = "acca[mnop]qrst\nabba[mnop]qrst\nabcd[bddb]xyyx\naaaa[qwer]tyui\nioxxoj[asdfgh]zxcvbn\nmacca[amnnmt]qrst\n";
-        assert_eq!(part_1(&test_case), "3");
+        let test_case = "pxfqsysywqfsmername[yfcktnozutkhniqyp]tjzzakrnlxrtscena[bitenzjdqfopqevroqo]zujogbgemdxiaven[dtxlpfkysfcivyrxqt]fsgjjgzltbnlvdojqvk";
+        assert_eq!(part_1(&test_case), "1");
     }
 
     #[test]
