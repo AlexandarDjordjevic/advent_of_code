@@ -1,3 +1,3 @@
-# advent_of_code
+# Advent of code
 
-Solutions for the https://adventofcode.com problems
+Solutions for a problems located on https://adventofcode.com
